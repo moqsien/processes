@@ -2,6 +2,7 @@ package processes
 
 import (
 	"fmt"
+	"os"
 	"sync"
 
 	"github.com/gogf/gf/container/gmap"
@@ -20,8 +21,8 @@ func NewProcManager() *ProcManager {
 }
 
 // NewProcess 创建新进程：path，可执行文件路径，一般os.Args[0]获取当前go程序可执行文件路径；name，进程名称
-func (that *ProcManager) NewProcess(path, name string, options ...Option) (p *ProcessPlus, err error) {
-	p = NewProcess(path, name)
+func (that *ProcManager) NewProcess(name string, options ...Option) (p *ProcessPlus, err error) {
+	p = NewProcess(os.Args[0], name)
 	if _, found := that.Container.Search(p.Name); found {
 		return nil, gerror.Newf("进程[%s]已存在", p.Name)
 	}
