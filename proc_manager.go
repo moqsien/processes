@@ -20,14 +20,19 @@ func NewProcManager() *ProcManager {
 }
 
 // NewProcess 创建新进程：path，可执行文件路径，一般os.Args[0]获取当前go程序可执行文件路径；name，进程名称
-func (that *ProcManager) NewProcess(path, name string) (p *ProcessPlus, err error) {
+func (that *ProcManager) NewProcess(path, name string, options ...Option) (p *ProcessPlus, err error) {
 	p = NewProcess(path, name)
 	if _, found := that.Container.Search(p.Name); found {
 		return nil, gerror.Newf("进程[%s]已存在", p.Name)
 	}
 	p.ProcManager = that
-	p.ProcSettings = GetDefaultProcSettings() // 先加载默认配置，之后可以通过settings中的方法进行修改
-	that.Add(name, p)                         // 新进程加入进程管理器中
+	p.ProcSettings = GetDefaultProcSettings() // 先加载默认配置，再根据options进行修改
+	if len(options) > 0 {
+		for _, option := range options {
+			option(p)
+		}
+	}
+	that.Add(name, p) // 新进程加入进程管理器中
 	return p, nil
 }
 

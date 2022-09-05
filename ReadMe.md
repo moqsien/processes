@@ -9,9 +9,9 @@
 manager := NewProcManager()
 path := os.Args[0]
 name := "test"
-process, _ := manager.NewProcess(path, name)
-process.SetProcArgs([]string{}) // 设置启动参数
-process.SetProcEnvVar("test", "test") // 设置环境变量
+process, _ := manager.NewProcess(path, 
+                                name,
+                                processes.ProcArgs([]string{"go", "get", "xxx"}))
 process.StartProc(true)
 ```
 
