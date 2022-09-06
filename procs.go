@@ -416,6 +416,7 @@ func (that *ProcessPlus) StartProc(wait bool) {
 		runCond.L.Lock()
 	}
 
+	// 异步起动进程
 	go func() {
 		for { // 一直尝试运行进程命令，直到成功或者超过最大重试次数
 			that.RunProc(func() {
@@ -443,6 +444,7 @@ func (that *ProcessPlus) StartProc(wait bool) {
 				time.Sleep(3 * time.Second)
 			}
 
+			// 对于隔一段时间运行一次的进程，可以重启
 			logger.Infof("因为该进程设置了自动重启,自动重启进程[%s],", that.Name)
 		}
 		that.Lock.Lock()
