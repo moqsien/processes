@@ -176,7 +176,7 @@ func (that *ProcessPlus) IsAutoRestart() bool {
 	} else {
 		that.Lock.RLock()
 		defer that.Lock.RUnlock()
-		if that.Cmd != nil && that.Cmd.ProcessState != nil {
+		if that.Cmd != nil && that.ProcessState != nil {
 			exitCode, err := that.GetExitCode()
 			// 如果自动重启设置为unexpected，则表示，在配置中已明确的退出code不需要重启，
 			// 不在预设的配置中的退出code则需要重启

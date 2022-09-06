@@ -15,21 +15,6 @@ const (
 
 /*
 =======================
-进程模式：
-
-	1、多进程
-	2、单进程
-*/
-type ProcessMode int
-
-const (
-	SingleProcess     ProcessMode = 0                     // Single 单进程模式
-	MultiProcess      ProcessMode = 1                     // Multi 多进程模式
-	RemarkOfMasterEnv string      = "MasterProcessRemark" // Remark 多进程模式下，用于标记主进程的环境变量的名称
-)
-
-/*
-=======================
 进程状态：
 
 	描述进程状态的类型
