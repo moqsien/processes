@@ -52,6 +52,11 @@ func ProcName(name string) Option {
 func ProcPath(path string) Option {
 	return func(p *ProcessPlus) {
 		p.Path = path
+		if len(p.Args) > 0 {
+			p.Args[0] = path
+		} else {
+			p.Args = []string{path}
+		}
 	}
 }
 

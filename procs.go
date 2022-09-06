@@ -48,6 +48,7 @@ func NewProcess(path, name string) (p *ProcessPlus) {
 		Setpgid:   true,
 		Pdeathsig: syscall.SIGKILL,
 	}
+	p.RetryTimes = new(int32)
 	return
 }
 

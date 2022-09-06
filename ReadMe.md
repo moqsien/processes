@@ -1,5 +1,4 @@
-### 进程管理工具
-
+### linux下go语言，进程管理
 - [x] 提供日志功能
 - [x] 提供进程自动重启功能
 - [x] 启动失败自动重试 
@@ -18,6 +17,7 @@ process, _ := manager.NewProcess(name,
                                 processes.ProcArgs([]string{"go", "get", "xxx"}))
 process.StartProc(true)
 ```
+[简单示例](https://github.com/moqsien/processes/examples)
 
 ### 设计原理
 1、exec.Cmd创建进程，执行外部命令；
