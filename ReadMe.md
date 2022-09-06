@@ -17,7 +17,7 @@ process, _ := manager.NewProcess(name,
                                 processes.ProcArgs([]string{"go", "get", "xxx"}))
 process.StartProc(true)
 ```
-[简单示例](https://github.com/moqsien/processes/tree/main/examples)
+[简单示例](https://github.com/moqsien/processes/blob/main/examples/main.go)
 
 ### 设计原理
 1、exec.Cmd创建进程，执行外部命令；
