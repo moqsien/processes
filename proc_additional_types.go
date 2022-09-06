@@ -46,6 +46,7 @@ const (
 	Fatal    ProcState = 64  // Fatal 启动失败
 	Unknown  ProcState = 128 // Unknown 未知状态
 	Failure  ProcState = Stopped | Fatal | Unknown | Exited | Suspend
+	Exist    ProcState = Running | Starting | Stopping
 )
 
 func (ps *ProcState) ToString() string {
