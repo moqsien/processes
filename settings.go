@@ -125,8 +125,8 @@ func ProcRedirectStderr(r bool) Option {
 // 	that.RedirectStderr = r
 // }
 
-// SetProcAutoReStart 设置进程自动重启的模式
-func SetProcAutoReStart(a AutoReStart) Option {
+// ProcAutoReStart 设置进程自动重启的模式
+func ProcAutoReStart(a AutoReStart) Option {
 	return func(p *ProcessPlus) {
 		p.AutoReStart = a
 	}
