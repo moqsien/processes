@@ -14,7 +14,7 @@ type IProc interface {
 	StartProc(wait bool)
 	StopProc(wait bool)
 	GetProcessInfo() *Info
-	Clone() (*ProcessPlus, error)
+	Clone() (IProc, error)
 }
 
 type Manager struct {

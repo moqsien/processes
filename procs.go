@@ -81,7 +81,7 @@ func (that *ProcessPlus) Init() (err error) {
 }
 
 // Clone 克隆进程
-func (that *ProcessPlus) Clone() (*ProcessPlus, error) {
+func (that *ProcessPlus) Clone() (IProc, error) {
 	proc := NewProcess(that.Path, that.Name)
 	proc.ProcManager = that.ProcManager
 
