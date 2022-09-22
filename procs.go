@@ -20,14 +20,14 @@ import (
 type ProcessPlus struct {
 	*exec.Cmd
 	*ProcSettings
-	ProcManager *ProcManager // 进程管理器
-	Name        string       // 进程名称
-	State       ProcState    // 进程的当前状态
-	Starting    bool         // 正在启动的时候，该值为true
-	StopByUser  bool         // 用户主动关闭的时候，该值为true
-	RetryTimes  *int32       // 启动重试的次数
-	StartTime   time.Time    // 启动时间
-	StopTime    time.Time    // 停止时间
+	ProcManager *Manager  // 进程管理器
+	Name        string    // 进程名称
+	State       ProcState // 进程的当前状态
+	Starting    bool      // 正在启动的时候，该值为true
+	StopByUser  bool      // 用户主动关闭的时候，该值为true
+	RetryTimes  *int32    // 启动重试的次数
+	StartTime   time.Time // 启动时间
+	StopTime    time.Time // 停止时间
 
 	Lock      sync.RWMutex
 	Stdin     io.WriteCloser
