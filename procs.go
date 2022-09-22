@@ -124,9 +124,8 @@ func (that *ProcessPlus) FailToStartProgram(reason string, finishCb func()) {
 
 // 获取配置的退出code值列表
 func (that *ProcessPlus) GetExitCodes() []int {
-	strExitCodes := that.ExitCodes
 	if len(that.ExitCodes) > 0 {
-		return strExitCodes
+		return that.ExitCodes
 	}
 	return []int{0, 2}
 }

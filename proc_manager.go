@@ -5,6 +5,7 @@ import (
 	"os"
 	"sync"
 
+	"github.com/gogf/gf/container/gmap"
 	"github.com/gogf/gf/errors/gerror"
 	"github.com/moqsien/processes/logger"
 )
@@ -17,14 +18,12 @@ type IProc interface {
 }
 
 type Manager struct {
-	ProcessList map[string]IProc
-	*sync.RWMutex
+	*gmap.StrAnyMap
 }
 
 func NewManager() *Manager {
 	return &Manager{
-		ProcessList: map[string]IProc{},
-		RWMutex:     &sync.RWMutex{},
+		StrAnyMap: gmap.NewStrAnyMap(),
 	}
 }
 
@@ -40,69 +39,39 @@ func (that *Manager) NewProcess(name string, options ...Option) (p *ProcessPlus,
 			option(p)
 		}
 	}
-	// that.Add(name, p) // 新进程加入进程管理器中
+	that.Add(name, p) // 添加进程
 	return p, nil
 }
 
-// Search 查找进程
-func (that *Manager) Search(name string) (value IProc, found bool) {
-	that.RLock()
-	defer that.RUnlock()
-	if that.ProcessList != nil {
-		value, found = that.ProcessList[name]
-	}
-	return
+// Add 添加进程，重复添加时会覆盖
+func (that *Manager) Add(name string, process IProc) {
+	// 使用IProc接口作为参数，方便外部对ProcessPlus进行封装
+	that.StrAnyMap.Set(name, process)
 }
 
-// Add 添加进程
-func (that *Manager) Add(name string, process IProc) {
-	that.Lock()
-	defer that.Unlock()
-	if that.ProcessList == nil {
-		that.ProcessList = make(map[string]IProc)
+// Search 查找进程
+func (that *Manager) SearchProc(name string) (value IProc, found bool) {
+	v, found := that.Search(name)
+	if found {
+		value = v.(IProc)
 	}
-	that.ProcessList[name] = process
+	return
 }
 
 // Remove 从列表移除进程
 func (that *Manager) Remove(name string) (value IProc) {
-	that.Lock()
-	defer that.Unlock()
-	if that.ProcessList != nil {
-		var ok bool
-		if value, ok = that.ProcessList[name]; ok {
-			delete(that.ProcessList, name)
-		}
-	}
+	that.StrAnyMap.Remove(name)
 	return
-}
-
-// Clear 清空进程列表
-func (that *Manager) Clear() {
-	that.Lock()
-	that.ProcessList = make(map[string]IProc)
-	that.Unlock()
-}
-
-// Iterator 对进程列表进行迭代
-func (that *Manager) Iterate(f func(key string, value IProc) bool) {
-	that.RLock()
-	defer that.RUnlock()
-	for k, v := range that.ProcessList {
-		if !f(k, v) {
-			break
-		}
-	}
 }
 
 // StopAllProcs 停止所有进程
 func (that *Manager) StopAllProcs() {
 	var wg sync.WaitGroup
-	that.Iterate(func(_ string, proc IProc) bool {
+	that.Iterator(func(_ string, value interface{}) bool {
 		wg.Add(1)
 		go func(w *sync.WaitGroup) {
 			defer w.Done()
-			proc.StopProc(true)
+			value.(IProc).StopProc(true)
 		}(&wg)
 		return true
 	})
@@ -112,17 +81,18 @@ func (that *Manager) StopAllProcs() {
 // GetAllProcs 获取所有进程的列表
 func (that *Manager) GetAllProcs() []IProc {
 	tmpProcList := make([]IProc, 0)
-	for _, proc := range that.ProcessList {
-		tmpProcList = append(tmpProcList, proc.(*ProcessPlus))
-	}
+	that.Iterator(func(_ string, value interface{}) bool {
+		tmpProcList = append(tmpProcList, value.(IProc))
+		return true
+	})
 	return tmpProcList
 }
 
 // GetAllProcsInfo 获取所有进程的信息列表
 func (that *Manager) GetAllProcsInfo() ([]*Info, error) {
 	AllProcessInfo := make([]*Info, 0)
-	that.Iterate(func(_ string, proc IProc) bool {
-		procInfo := proc.GetProcessInfo()
+	that.Iterator(func(_ string, value interface{}) bool {
+		procInfo := value.(IProc).GetProcessInfo()
 		AllProcessInfo = append(AllProcessInfo, procInfo)
 		return true
 	})
@@ -132,10 +102,12 @@ func (that *Manager) GetAllProcsInfo() ([]*Info, error) {
 // GracefulReload 平滑重启
 func (that *Manager) GracefulReload(name string, wait bool) (bool, error) {
 	logger.Infof("平滑重启进程[%s]", name)
-	proc, ok := that.Search(name)
+	p, ok := that.Search(name)
 	if !ok {
 		return false, fmt.Errorf("没有找到要重启的进程[%s]", name)
 	}
+
+	proc := p.(IProc)
 	procClone, err := proc.Clone()
 	if err != nil {
 		return false, err
@@ -143,5 +115,5 @@ func (that *Manager) GracefulReload(name string, wait bool) (bool, error) {
 	procClone.StartProc(wait)
 	proc.StopProc(wait)
 	that.Add(name, procClone)
-	return true, nil
+	return ok, nil
 }

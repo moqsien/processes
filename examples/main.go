@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"runtime"
 	"time"
 
 	"github.com/gogf/gf/container/gtree"
@@ -28,6 +27,7 @@ func test(key interface{}, _ interface{}) bool {
 		processes.ProcStdoutLog("/dev/stdout", ""),
 	)
 	process.StartProc(true)
+	manager.Add(name, process)
 	return true
 }
 
@@ -36,25 +36,6 @@ func t(key string) {
 		fmt.Println(">>>process: ", key)
 		time.Sleep(time.Duration(2) * time.Second)
 	}
-}
-
-func test2(key interface{}, value interface{}) bool {
-	fmt.Println("hello", key, value)
-	i, _ := value.(int64)
-	time.Sleep(time.Duration(i) * time.Second)
-	name, _ := key.(string)
-	t(name)
-	return true
-}
-
-func test3(key, value interface{}) bool {
-	fmt.Println("+++", key, value)
-	ch <- key
-	k, _ := key.(string)
-	if k == "d" {
-		close(ch)
-	}
-	return true
 }
 
 func main() {
@@ -69,23 +50,8 @@ func main() {
 		fmt.Println(args)
 		t(args[0])
 	}
-	fmt.Println(runtime.NumGoroutine())
-	// tree := gtree.NewAVLTree(gutil.ComparatorInt)
-	// for i := 0; i < 10; i++ {
-	// 	tree.Set(i, i*10)
-	// }
-	// // 打印树形
-	// tree.Print()
-	// // 前序遍历
-	// fmt.Println("ASC:")
-	// tree.IteratorAsc(func(key, value interface{}) bool {
-	// 	fmt.Println(key, value)
-	// 	return true
-	// })
-	// // 后续遍历
-	// fmt.Println("DESC:")
-	// tree.IteratorDesc(func(key, value interface{}) bool {
-	// 	fmt.Println(key, value)
-	// 	return true
-	// })
+	p, found := manager.SearchProc("a")
+	if found {
+		fmt.Println(p.GetProcessInfo())
+	}
 }
